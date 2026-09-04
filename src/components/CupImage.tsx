@@ -2,13 +2,7 @@
 
 import Image from "next/image";
 import { useMemo, useState } from "react";
-import { IPFS_CID } from "@/lib/cups";
-
-const GATEWAYS = [
-  `https://gateway.pinata.cloud/ipfs/${IPFS_CID}`,
-  `https://ipfs.io/ipfs/${IPFS_CID}`,
-  `https://dweb.link/ipfs/${IPFS_CID}`,
-];
+import { cupImageUrl, GATEWAYS } from "@/lib/cups";
 
 type CupImageProps = {
   id: number;
@@ -35,7 +29,7 @@ export function CupImage({
   const [failed, setFailed] = useState(false);
 
   const src = useMemo(
-    () => `${GATEWAYS[Math.min(gatewayIndex, GATEWAYS.length - 1)]}/Cupscription_${id}.jpg`,
+    () => cupImageUrl(id, gatewayIndex),
     [gatewayIndex, id],
   );
 

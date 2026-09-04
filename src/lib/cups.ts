@@ -1,13 +1,22 @@
 export const SUPPLY = 5000;
 
-/** Compressed collection pinned on Pinata (public gateway). */
+/** Compressed collection CID (pinned on Pinata; served via public gateways). */
 export const IPFS_CID =
   "QmcL3Yswr6dDuQWnA5nmbqoB9ZSTQ2r34pLKskfLiwftPi";
 
-export const GATEWAY_BASE = `https://gateway.pinata.cloud/ipfs/${IPFS_CID}`;
+/** Prefer public gateways — Pinata's free dedicated gateway is over limit. */
+export const GATEWAYS = [
+  `https://ipfs.io/ipfs/${IPFS_CID}`,
+  `https://dweb.link/ipfs/${IPFS_CID}`,
+  `https://cloudflare-ipfs.com/ipfs/${IPFS_CID}`,
+  `https://gateway.pinata.cloud/ipfs/${IPFS_CID}`,
+] as const;
 
-export function cupImageUrl(id: number): string {
-  return `${GATEWAY_BASE}/Cupscription_${id}.jpg`;
+export const GATEWAY_BASE = GATEWAYS[0];
+
+export function cupImageUrl(id: number, gatewayIndex = 0): string {
+  const base = GATEWAYS[Math.min(gatewayIndex, GATEWAYS.length - 1)];
+  return `${base}/Cupscription_${id}.jpg`;
 }
 
 export function clampCupId(id: number): number | null {
