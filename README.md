@@ -19,5 +19,10 @@ Open [http://localhost:3000](http://localhost:3000).
 
 - `/` — landing
 - `/collection` — paginated grid
-- `/cup/[id]` — single cup (1–5000)
+- `/cup/[id]` — single cup (1–5000) with traits
 - `/trade` — marketplace placeholder
+
+## Traits
+
+Collection metadata lives in `src/data/cupscriptions.json` (from `E:\cupscriptions.json`).
+Item `id` fields in that file are all `0`; cups are keyed by the `#N` in each `name`.

@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CupImage } from "@/components/CupImage";
 import { clampCupId, cupImageUrl, SUPPLY } from "@/lib/cups";
+import { getCupMeta } from "@/lib/traits";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -14,9 +15,16 @@ export async function generateMetadata({
   const { id: raw } = await params;
   const id = clampCupId(Number(raw));
   if (!id) return { title: "Not found" };
+  const meta = getCupMeta(id);
+  const traitLine = meta?.attributes
+    .map((a) => `${a.trait_type}: ${a.value}`)
+    .slice(0, 3)
+    .join(" · ");
   return {
-    title: `Cupscription #${id}`,
-    description: `Cupscription #${id} — hand-drawn Ethscription by Goldie.`,
+    title: meta?.name ?? `Cupscription #${id}`,
+    description:
+      traitLine ||
+      `Cupscription #${id} — hand-drawn Ethscription by Goldie.`,
     openGraph: {
       images: [cupImageUrl(id)],
     },
@@ -28,8 +36,10 @@ export default async function CupPage({ params }: PageProps) {
   const id = clampCupId(Number(raw));
   if (!id) notFound();
 
+  const meta = getCupMeta(id);
   const prev = id > 1 ? id - 1 : null;
   const next = id < SUPPLY ? id + 1 : null;
+  const attributes = meta?.attributes ?? [];
 
   return (
     <div className="px-5 pb-20 pt-24 md:px-8">
@@ -53,20 +63,48 @@ export default async function CupPage({ params }: PageProps) {
               #{id}
             </h1>
             <p className="mt-4 max-w-md text-mute">
-              One of {SUPPLY.toLocaleString()} hand-drawn cups inscribed as an
+              {meta?.name ?? `Cupscription #${id}`} — one of{" "}
+              {SUPPLY.toLocaleString()} hand-drawn cups inscribed as an
               Ethscription on Ethereum.
             </p>
           </div>
 
-          <dl className="grid gap-4 border-y border-ash py-6 text-sm">
-            <div className="flex justify-between gap-4">
-              <dt className="text-mute">Artist</dt>
-              <dd className="text-bone">Goldie</dd>
+          {attributes.length > 0 ? (
+            <div>
+              <h2 className="text-sm uppercase tracking-[0.28em] text-mute">
+                Traits
+              </h2>
+              <ul className="mt-4 grid gap-2 sm:grid-cols-2">
+                {attributes.map((attr) => (
+                  <li
+                    key={`${attr.trait_type}-${attr.value}`}
+                    className="border border-ash bg-ink-soft px-3 py-3"
+                  >
+                    <p className="text-xs uppercase tracking-[0.18em] text-mute">
+                      {attr.trait_type}
+                    </p>
+                    <p className="mt-1 text-sm font-medium text-bone">
+                      {attr.value}
+                    </p>
+                  </li>
+                ))}
+              </ul>
             </div>
+          ) : null}
+
+          <dl className="grid gap-4 border-y border-ash py-6 text-sm">
             <div className="flex justify-between gap-4">
               <dt className="text-mute">Protocol</dt>
               <dd className="text-bone">Ethscriptions</dd>
             </div>
+            {meta?.ethscriptionId ? (
+              <div className="flex justify-between gap-4">
+                <dt className="text-mute">Ethscription</dt>
+                <dd className="truncate text-bone" title={meta.ethscriptionId}>
+                  {meta.ethscriptionId.slice(0, 10)}…
+                </dd>
+              </div>
+            ) : null}
             <div className="flex justify-between gap-4">
               <dt className="text-mute">Image</dt>
               <dd>
