@@ -1,0 +1,115 @@
+@import "tailwindcss";
+
+:root {
+  --ink: #0c0a08;
+  --ink-soft: #1a1612;
+  --ash: #2a2420;
+  --bone: #f3ebe1;
+  --mute: #a8998a;
+  --ember: #d9480f;
+  --ember-hot: #ff6b2c;
+  --glaze: #3d7a8c;
+  --background: var(--ink);
+  --foreground: var(--bone);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ash: var(--ash);
+  --color-bone: var(--bone);
+  --color-mute: var(--mute);
+  --color-ember: var(--ember);
+  --color-ember-hot: var(--ember-hot);
+  --color-glaze: var(--glaze);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body), system-ui, sans-serif;
+  min-height: 100%;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--ember) 70%, transparent);
+  color: var(--bone);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes mosaic-drift {
+  from {
+    transform: scale(1.08) translate3d(0, 0, 0);
+  }
+  to {
+    transform: scale(1.14) translate3d(-1.5%, -1%, 0);
+  }
+}
+
+@keyframes ember-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+.animate-rise {
+  animation: rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-rise-delay-1 {
+  animation-delay: 0.12s;
+}
+
+.animate-rise-delay-2 {
+  animation-delay: 0.24s;
+}
+
+.animate-rise-delay-3 {
+  animation-delay: 0.36s;
+}
+
+.mosaic-layer {
+  animation: mosaic-drift 28s ease-in-out infinite alternate;
+}
+
+.ember-glow {
+  animation: ember-pulse 5s ease-in-out infinite;
+}
+
+.cup-tile {
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.35s ease;
+}
+
+.cup-tile:hover {
+  transform: scale(1.035);
+  filter: brightness(1.08);
+  z-index: 2;
+}
