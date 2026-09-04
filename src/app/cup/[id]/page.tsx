@@ -78,7 +78,7 @@ export default async function CupPage({ params }: PageProps) {
                 {attributes.map((attr) => (
                   <li
                     key={`${attr.trait_type}-${attr.value}`}
-                    className="border border-ash bg-ink-soft px-3 py-3"
+                    className="border border-ash border-l-volt bg-ink-soft px-3 py-3"
                   >
                     <p className="text-xs uppercase tracking-[0.18em] text-mute">
                       {attr.trait_type}
@@ -112,7 +112,7 @@ export default async function CupPage({ params }: PageProps) {
                   href={cupImageUrl(id)}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-ember transition hover:text-ember-hot"
+                  className="text-volt transition hover:text-volt-hot"
                 >
                   Open IPFS
                 </a>
@@ -147,7 +147,7 @@ export default async function CupPage({ params }: PageProps) {
 
           <Link
             href="/trade"
-            className="inline-flex w-fit bg-ember px-5 py-3 text-sm font-semibold text-bone transition hover:bg-ember-hot"
+            className="inline-flex w-fit bg-volt px-5 py-3 text-sm font-semibold text-ink transition hover:bg-volt-hot"
           >
             Trade (coming soon)
           </Link>

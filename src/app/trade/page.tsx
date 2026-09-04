@@ -21,7 +21,7 @@ export default function TradePage() {
           their front-end.
         </p>
         <ul className="mt-8 space-y-3 text-mute">
-          <li className="border-l-2 border-ember pl-4">
+          <li className="border-l-2 border-volt pl-4">
             Browse and share cups from the collection today
           </li>
           <li className="border-l-2 border-ash pl-4">
@@ -33,7 +33,7 @@ export default function TradePage() {
         </ul>
         <Link
           href="/collection"
-          className="mt-10 inline-flex bg-ember px-6 py-3 text-sm font-semibold text-bone transition hover:bg-ember-hot"
+          className="mt-10 inline-flex bg-volt px-6 py-3 text-sm font-semibold text-ink transition hover:bg-volt-hot"
         >
           Back to collection
         </Link>

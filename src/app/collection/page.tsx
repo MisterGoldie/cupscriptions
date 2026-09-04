@@ -59,7 +59,7 @@ function Pagination({ page, pages }: { page: number; pages: number }) {
       {prev ? (
         <Link
           href={`/collection?page=${prev}`}
-          className="border border-ash px-3 py-2 text-bone transition hover:border-mute"
+          className="border border-ash px-3 py-2 text-bone transition hover:border-volt hover:text-volt"
         >
           Prev
         </Link>
@@ -72,7 +72,7 @@ function Pagination({ page, pages }: { page: number; pages: number }) {
       {next ? (
         <Link
           href={`/collection?page=${next}`}
-          className="border border-ash px-3 py-2 text-bone transition hover:border-mute"
+          className="border border-ash px-3 py-2 text-bone transition hover:border-volt hover:text-volt"
         >
           Next
         </Link>

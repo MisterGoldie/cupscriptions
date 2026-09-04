@@ -6,8 +6,10 @@
   --ash: #2a2420;
   --bone: #f3ebe1;
   --mute: #a8998a;
+  --volt: #ccff01;
+  --volt-hot: #e6ff66;
+  --volt-dim: color-mix(in srgb, #ccff01 18%, transparent);
   --ember: #d9480f;
-  --ember-hot: #ff6b2c;
   --glaze: #3d7a8c;
   --background: var(--ink);
   --foreground: var(--bone);
@@ -21,8 +23,10 @@
   --color-ash: var(--ash);
   --color-bone: var(--bone);
   --color-mute: var(--mute);
+  --color-volt: var(--volt);
+  --color-volt-hot: var(--volt-hot);
+  --color-volt-dim: var(--volt-dim);
   --color-ember: var(--ember);
-  --color-ember-hot: var(--ember-hot);
   --color-glaze: var(--glaze);
   --font-sans: var(--font-body);
   --font-display: var(--font-display);
@@ -44,8 +48,8 @@ body {
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--ember) 70%, transparent);
-  color: var(--bone);
+  background: var(--volt);
+  color: var(--ink);
 }
 
 @keyframes rise {
@@ -68,13 +72,13 @@ body {
   }
 }
 
-@keyframes ember-pulse {
+@keyframes volt-pulse {
   0%,
   100% {
-    opacity: 0.55;
+    opacity: 0.35;
   }
   50% {
-    opacity: 0.9;
+    opacity: 0.65;
   }
 }
 
@@ -98,18 +102,20 @@ body {
   animation: mosaic-drift 28s ease-in-out infinite alternate;
 }
 
-.ember-glow {
-  animation: ember-pulse 5s ease-in-out infinite;
+.volt-glow {
+  animation: volt-pulse 5s ease-in-out infinite;
 }
 
 .cup-tile {
   transition:
     transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.35s ease,
     filter 0.35s ease;
 }
 
 .cup-tile:hover {
   transform: scale(1.035);
-  filter: brightness(1.08);
+  filter: brightness(1.06);
+  box-shadow: 0 0 0 1px var(--volt);
   z-index: 2;
 }

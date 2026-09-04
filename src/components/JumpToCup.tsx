@@ -32,11 +32,11 @@ export function JumpToCup({ className }: { className?: string }) {
         placeholder={`#1–${SUPPLY}`}
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        className="w-28 border border-ash bg-ink-soft px-3 py-2 text-sm text-bone outline-none placeholder:text-mute/60 focus:border-mute"
+        className="w-28 border border-ash bg-ink-soft px-3 py-2 text-sm text-bone outline-none placeholder:text-mute/60 focus:border-volt"
       />
       <button
         type="submit"
-        className="border border-ash px-3 py-2 text-sm text-bone transition hover:border-mute"
+        className="border border-ash px-3 py-2 text-sm text-bone transition hover:border-volt hover:text-volt"
       >
         Go
       </button>

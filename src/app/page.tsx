@@ -22,12 +22,13 @@ export default function HomePage() {
           ))}
         </div>
         <div className="absolute inset-0 -z-10 bg-gradient-to-b from-ink/70 via-ink/80 to-ink" />
-        <div className="ember-glow pointer-events-none absolute -left-24 top-1/3 -z-10 h-72 w-72 rounded-full bg-ember/30 blur-3xl" />
-        <div className="pointer-events-none absolute -right-16 bottom-1/4 -z-10 h-64 w-64 rounded-full bg-glaze/25 blur-3xl" />
+        <div className="volt-glow pointer-events-none absolute -left-24 top-1/3 -z-10 h-72 w-72 rounded-full bg-volt/20 blur-3xl" />
+        <div className="pointer-events-none absolute -right-16 bottom-1/4 -z-10 h-64 w-64 rounded-full bg-glaze/20 blur-3xl" />
 
         <div className="mx-auto flex min-h-[100svh] max-w-5xl flex-col justify-end px-5 pb-16 pt-28 md:justify-center md:px-8 md:pb-24">
           <p className="animate-rise text-sm uppercase tracking-[0.28em] text-mute">
-            Ethscriptions · 5,000 cups
+            Ethscriptions ·{" "}
+            <span className="text-volt">5,000 cups</span>
           </p>
           <h1 className="animate-rise animate-rise-delay-1 mt-4 font-[family-name:var(--font-display)] text-6xl font-extrabold leading-[0.92] tracking-tight text-bone sm:text-7xl md:text-8xl">
             Cupscriptions
@@ -39,13 +40,13 @@ export default function HomePage() {
           <div className="animate-rise animate-rise-delay-3 mt-10 flex flex-wrap gap-4">
             <Link
               href="/collection"
-              className="bg-ember px-6 py-3 text-sm font-semibold tracking-wide text-bone transition hover:bg-ember-hot"
+              className="bg-volt px-6 py-3 text-sm font-semibold tracking-wide text-ink transition hover:bg-volt-hot"
             >
               Browse {SUPPLY.toLocaleString()}
             </Link>
             <Link
               href="/trade"
-              className="border border-bone/25 px-6 py-3 text-sm font-semibold tracking-wide text-bone transition hover:border-bone/60"
+              className="border border-bone/25 px-6 py-3 text-sm font-semibold tracking-wide text-bone transition hover:border-volt hover:text-volt"
             >
               Trade soon
             </Link>
@@ -67,7 +68,7 @@ export default function HomePage() {
           </div>
           <Link
             href="/collection"
-            className="text-sm font-semibold uppercase tracking-[0.2em] text-ember transition hover:text-ember-hot"
+            className="text-sm font-semibold uppercase tracking-[0.2em] text-volt transition hover:text-volt-hot"
           >
             Enter the kiln →
           </Link>
