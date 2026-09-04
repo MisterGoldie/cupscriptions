@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Figtree, Syne } from "next/font/google";
+import { Providers } from "@/components/Providers";
 import { SiteHeader } from "@/components/SiteHeader";
 import "./globals.css";
 
@@ -32,8 +33,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${display.variable} ${body.variable} h-full`}>
       <body className="min-h-full flex flex-col antialiased">
-        <SiteHeader />
-        <main className="flex-1">{children}</main>
+        <Providers>
+          <SiteHeader />
+          <main className="flex-1">{children}</main>
+        </Providers>
       </body>
     </html>
   );
