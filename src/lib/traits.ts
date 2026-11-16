@@ -29,20 +29,27 @@ function displayIdFromName(name: string): number | null {
 }
 
 const cupsById = new Map<number, CupMeta>();
+const cupsByEthscriptionId = new Map<string, CupMeta>();
 
 for (const item of (collection as RawCollection).collection_items) {
   const id = displayIdFromName(item.name);
   if (!id) continue;
-  cupsById.set(id, {
+  const cup = {
     id,
     name: item.name,
     ethscriptionId: item.ethscription_id,
     attributes: item.item_attributes ?? [],
-  });
+  };
+  cupsById.set(id, cup);
+  cupsByEthscriptionId.set(cup.ethscriptionId.toLowerCase(), cup);
 }
 
 export function getCupMeta(id: number): CupMeta | undefined {
   return cupsById.get(id);
+}
+
+export function getCupMetaByEthscriptionId(id: string): CupMeta | undefined {
+  return cupsByEthscriptionId.get(id.toLowerCase());
 }
 
 export function getTraitTypes(): string[] {

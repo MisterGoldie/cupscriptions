@@ -1,25 +1,22 @@
-import { CUP_TOKEN, EXPLORER_API } from "@/lib/wagmi";
+import { getCupMetaByEthscriptionId } from "@/lib/traits";
+
+const ETHSCRIPTIONS_API = "https://api.ethscriptions.com/v2";
 
 export type OwnedCup = {
   /** Display id 1–5000 (Cupscription #N) */
   id: number;
-  /** On-chain ERC-721 token id (0-indexed) */
-  tokenId: number;
   name: string;
-  ethscriptionId?: string;
+  ethscriptionId: string;
 };
 
-type ExplorerInstance = {
-  id: string;
-  metadata?: {
-    name?: string;
-    ethscription_id?: string;
-  };
+type Ethscription = {
+  transaction_hash: string;
+  current_owner: string;
 };
 
-type ExplorerPage = {
-  items: ExplorerInstance[];
-  next_page_params: { unique_token?: string } | null;
+type EthscriptionsPage = {
+  result: Ethscription[];
+  pagination: { page_key: string | null; has_more: boolean };
 };
 
 function isAddress(value: string): boolean {
@@ -31,40 +28,60 @@ export async function fetchOwnedCups(address: string): Promise<OwnedCup[]> {
     throw new Error("Invalid wallet address");
   }
 
-  const owned: OwnedCup[] = [];
-  let uniqueToken: string | undefined;
+  const owner = address.toLowerCase();
+  const owned = new Map<number, OwnedCup>();
+  const seenPageKeys = new Set<string>();
+  let pageKey: string | undefined;
 
-  for (let page = 0; page < 50; page += 1) {
-    const url = new URL(
-      `${EXPLORER_API}/tokens/${CUP_TOKEN}/instances`,
-    );
-    url.searchParams.set("holder_address_hash", address);
-    if (uniqueToken) url.searchParams.set("unique_token", uniqueToken);
+  do {
+    const url = new URL(`${ETHSCRIPTIONS_API}/ethscriptions`);
+    url.searchParams.set("current_owner", owner);
+    url.searchParams.set("max_results", "50");
+    if (pageKey) url.searchParams.set("page_key", pageKey);
 
     const res = await fetch(url.toString(), {
       headers: { Accept: "application/json" },
-      next: { revalidate: 60 },
+      cache: "no-store",
+      signal: AbortSignal.timeout(30_000),
     });
 
     if (!res.ok) {
-      throw new Error(`Explorer returned ${res.status}`);
+      throw new Error(`Ethscriptions API returned ${res.status}`);
     }
 
-    const data = (await res.json()) as ExplorerPage;
-    for (const item of data.items ?? []) {
-      const tokenId = Number(item.id);
-      if (!Number.isInteger(tokenId) || tokenId < 0) continue;
-      owned.push({
-        tokenId,
-        id: tokenId + 1,
-        name: item.metadata?.name ?? `Cupscription #${tokenId + 1}`,
-        ethscriptionId: item.metadata?.ethscription_id,
+    const data = (await res.json()) as EthscriptionsPage;
+    if (
+      !Array.isArray(data.result) ||
+      typeof data.pagination?.has_more !== "boolean"
+    ) {
+      throw new Error("Ethscriptions API returned an invalid ownership response");
+    }
+
+    for (const item of data.result) {
+      if (
+        typeof item.transaction_hash !== "string" ||
+        typeof item.current_owner !== "string" ||
+        item.current_owner.toLowerCase() !== owner
+      ) {
+        throw new Error("Ethscriptions API returned an invalid ownership record");
+      }
+      const cup = getCupMetaByEthscriptionId(item.transaction_hash);
+      if (!cup) continue;
+      owned.set(cup.id, {
+        id: cup.id,
+        name: cup.name,
+        ethscriptionId: cup.ethscriptionId,
       });
     }
 
-    uniqueToken = data.next_page_params?.unique_token;
-    if (!uniqueToken) break;
-  }
+    if (!data.pagination.has_more) break;
+    const nextKey = data.pagination.page_key;
+    if (typeof nextKey !== "string" || !nextKey || seenPageKeys.has(nextKey)) {
+      throw new Error("Ethscriptions API returned invalid ownership pagination");
+    }
+    seenPageKeys.add(nextKey);
+    pageKey = nextKey;
+  } while (pageKey);
 
-  return owned.sort((a, b) => a.id - b.id);
+  return [...owned.values()].sort((a, b) => a.id - b.id);
 }

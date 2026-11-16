@@ -25,11 +25,13 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Wallet
 
-Connect via browser extension (MetaMask, etc.). Ownership is loaded from the Ethscriptions explorer:
+Connect via browser extension (MetaMask, etc.). Ownership is loaded from the Ethscriptions indexer:
 
-`/api/v2/tokens/0x4fC9…/instances?holder_address_hash={wallet}`
+`https://api.ethscriptions.com/v2/ethscriptions?current_owner={wallet}&max_results=50`
 
-Token ids are 0-indexed on-chain; the site displays Cupscription `#N` as `tokenId + 1`.
+The lookup follows all ownership pages and matches each `transaction_hash` against
+the collection's `ethscription_id` metadata to determine its cup number. Ownership
+requests bypass the server cache so Refresh performs a fresh lookup.
 
 ## Traits
 

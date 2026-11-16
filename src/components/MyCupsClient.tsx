@@ -62,7 +62,9 @@ export function MyCupsClient() {
           <p className="mt-2 text-mute">
             {isLoading || isFetching
               ? "Looking up ownership…"
-              : `${data?.count ?? 0} cup${data?.count === 1 ? "" : "s"} in this wallet`}
+              : isError
+                ? "Ownership lookup failed"
+                : `${data?.count ?? 0} cup${data?.count === 1 ? "" : "s"} in this wallet`}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
@@ -98,9 +100,8 @@ export function MyCupsClient() {
         <div className="border border-ash bg-ink-soft px-5 py-10">
           <p className="text-lg text-bone">No Cupscriptions in this wallet.</p>
           <p className="mt-2 max-w-lg text-mute">
-            Ownership is read from the Ethscriptions explorer for the CUP
-            collection contract. If you just received a cup, hit Refresh in a
-            minute.
+            Ownership is read from the Ethscriptions indexer and matched to this
+            collection. If you just received a cup, hit Refresh in a minute.
           </p>
           <Link
             href="/collection"
