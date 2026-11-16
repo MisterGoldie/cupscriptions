@@ -1,19 +1,23 @@
 import type { Metadata } from "next";
-import { Figtree, Syne } from "next/font/google";
+import localFont from "next/font/local";
 import { Providers } from "@/components/Providers";
 import { SiteHeader } from "@/components/SiteHeader";
 import "./globals.css";
 
-const display = Syne({
+const display = localFont({
+  src: "./fonts/Syne-Variable.ttf",
   variable: "--font-display",
-  subsets: ["latin"],
-  weight: ["600", "700", "800"],
+  weight: "600 800",
+  style: "normal",
+  display: "swap",
 });
 
-const body = Figtree({
+const body = localFont({
+  src: "./fonts/Figtree-Variable.ttf",
   variable: "--font-body",
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: "400 600",
+  style: "normal",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
