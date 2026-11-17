@@ -6,7 +6,7 @@ export const config = createConfig({
   connectors: [injected({ shimDisconnect: true })],
   transports: {
     [mainnet.id]: http(),
-    [sepolia.id]: http(),
+    [sepolia.id]: http("https://ethereum-sepolia-rpc.publicnode.com"),
     [foundry.id]: http("http://127.0.0.1:8545"),
   },
   ssr: true,

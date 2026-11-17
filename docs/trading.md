@@ -7,6 +7,10 @@ and cannot issue purchase authorizations or offer transaction controls.
 
 ## Configure after a reviewed testnet deployment
 
+For Ethereum Sepolia, follow [the separate test collection setup](sepolia.md)
+first. Its three confirmed creation transaction hashes produce a different
+Merkle root. The 5,000 mainnet hashes must never be used as test inscriptions.
+
 1. Install root dependencies and the separate contract development dependencies.
    Run `npm run contracts:build`. This generates the app's checked-in ABI and
    runtime fingerprint from the same Solidity implementation, plus deployment
@@ -35,7 +39,9 @@ and cannot issue purchase authorizations or offer transaction controls.
    - `MARKET_RPC_URL`: a reliable HTTPS RPC on that exact chain.
    - `MARKET_INDEXER_URL`: an Ethscriptions v2 API on the same chain. Ethereum
      defaults to `https://api.ethscriptions.com/v2`; other chains require an
-     explicitly supplied indexer. Never use mainnet ownership for testnet.
+     explicitly supplied indexer. The Sepolia adapter additionally requires
+     `chain_id: 11155111` and `ready: true` from its status endpoint. Never use
+     mainnet ownership for testnet.
    - `MARKET_VERIFIER_PRIVATE_KEY`: the dedicated signer's key. Its address must
      match the contract's immutable verifier. Never prefix it with `NEXT_PUBLIC_`.
 

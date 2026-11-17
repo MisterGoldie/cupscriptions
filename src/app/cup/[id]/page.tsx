@@ -146,7 +146,8 @@ export default async function CupPage({ params }: PageProps) {
             ) : null}
           </div>
 
-          {meta?.ethscriptionId && <CupTrading key={id} id={id} ethscriptionId={meta.ethscriptionId} />}
+          {process.env.MARKET_CHAIN_ID === "11155111" ? <p className="text-sm text-mute">Marketplace testing is on Ethereum Sepolia. <Link href="/sepolia" className="text-volt underline">Open the test collection</Link>.</p>
+            : meta?.ethscriptionId && <CupTrading key={id} id={id} ethscriptionId={meta.ethscriptionId} />}
         </div>
       </div>
     </div>

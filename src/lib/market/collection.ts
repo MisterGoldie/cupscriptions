@@ -1,37 +1,31 @@
 import collection from "@/data/cupscriptions.json";
-import { concatHex, encodeAbiParameters, keccak256, type Hex } from "viem";
+import sepolia from "@/data/sepolia-cupscriptions.json";
+import type { Hex } from "viem";
+import { buildMarketTree } from "../../../shared/market-tree.mjs";
 
-let cached: { root: Hex; proofs: Map<string, Hex[]> } | undefined;
+export type SepoliaItem = { number: number; ethscriptionId: Hex; creationBlock: string; creationBlockHash: Hex; contentUri: string };
+export type SepoliaManifest = { version: number; chainId: number; name: string; initialOwner: string; items: SepoliaItem[] };
+const cached = new Map<number, ReturnType<typeof buildCollectionProfile>>();
 
-export function marketCollection() {
-  if (cached) return cached;
-  const ids = collection.collection_items.map((cup) => cup.ethscription_id.toLowerCase() as Hex);
-  if (ids.length !== 5000 || new Set(ids).size !== 5000 || ids.some((id) => !/^0x[0-9a-f]{64}$/.test(id))) {
-    throw new Error("Invalid market collection");
+export function buildCollectionProfile(chainId: number, manifest: SepoliaManifest = sepolia as SepoliaManifest) {
+  if (![1, 11155111, 31337].includes(chainId)) throw new Error("Unsupported marketplace network");
+  const testnet = chainId === 11155111;
+  const mainnetIds = new Set(collection.collection_items.map((cup) => cup.ethscription_id.toLowerCase()));
+  if (testnet && (manifest.chainId !== 11155111 || manifest.version !== 1 || manifest.items.length !== 3 ||
+      manifest.items.some((item) => mainnetIds.has(item.ethscriptionId.toLowerCase()) || ![1,2,3].includes(item.number)))) {
+    throw new Error("Sepolia collection requires three separate confirmed test inscriptions");
   }
-  const entries = ids.map((id) => ({ id, leaf: keccak256(keccak256(encodeAbiParameters([{ type: "bytes32" }], [id]))) }))
-    .sort((a, b) => a.leaf < b.leaf ? -1 : a.leaf > b.leaf ? 1 : 0);
-  const layers: Hex[][] = [entries.map((entry) => entry.leaf)];
-  while (layers.at(-1)!.length > 1) {
-    const layer = layers.at(-1)!;
-    const next: Hex[] = [];
-    for (let i = 0; i < layer.length; i += 2) {
-      const a = layer[i], b = layer[i + 1];
-      next.push(b ? keccak256(concatHex(a < b ? [a, b] : [b, a])) : a);
-    }
-    layers.push(next);
-  }
-  const proofs = new Map<string, Hex[]>();
-  entries.forEach((entry, initialIndex) => {
-    let index = initialIndex;
-    const proof: Hex[] = [];
-    for (const layer of layers.slice(0, -1)) {
-      const sibling = index ^ 1;
-      if (sibling < layer.length) proof.push(layer[sibling]);
-      index = Math.floor(index / 2);
-    }
-    proofs.set(entry.id, proof);
-  });
-  cached = { root: layers.at(-1)![0], proofs };
-  return cached;
+  const cups = testnet
+    ? manifest.items.map((item) => ({ id: item.number, name: `Sepolia Test Cup #${item.number}`, ethscriptionId: item.ethscriptionId, attributes: [] }))
+    : collection.collection_items.map((cup) => ({ id: Number(cup.name.match(/#(\d+)$/)?.[1]), name: cup.name, ethscriptionId: cup.ethscription_id as Hex, attributes: cup.item_attributes }));
+  if (!testnet && (cups.length !== 5000 || cups.some((cup) => cup.id < 1 || cup.id > 5000))) throw new Error("Invalid mainnet collection");
+  const tree = buildMarketTree(cups.map((cup) => ({ number: cup.id, id: cup.ethscriptionId as Hex })));
+  return { ...tree, testnet, byId: new Map(cups.map((cup) => [cup.id, cup])), byHash: new Map(cups.map((cup) => [cup.ethscriptionId.toLowerCase(), cup])) };
+}
+
+export function marketCollection(chainId = 1) {
+  if (![1, 11155111, 31337].includes(chainId)) throw new Error("Unsupported marketplace network");
+  const key = chainId === 11155111 ? 11155111 : 1;
+  if (!cached.has(key)) cached.set(key, buildCollectionProfile(key));
+  return cached.get(key)!;
 }

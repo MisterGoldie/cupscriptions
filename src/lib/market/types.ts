@@ -15,6 +15,7 @@ export type MarketInfo = {
 };
 
 export type MarketCup = {
+  testnet: boolean;
   id: number;
   ethscriptionId: Hex;
   owner: Address;

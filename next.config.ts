@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  distDir: process.env.CUPSCRIPTIONS_SEPOLIA_PREVIEW === "1" ? ".next-sepolia" : ".next",
   images: {
     remotePatterns: [
       {

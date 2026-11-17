@@ -41,7 +41,7 @@ function indexedCup(value: unknown): IndexedCup {
   return cup;
 }
 
-export function createMarketIndexer(baseUrl: string, fetcher: typeof fetch = fetch) {
+export function createMarketIndexer(baseUrl: string, fetcher: typeof fetch = fetch, expectedChainId?: number) {
   async function get(path: string, query?: URLSearchParams): Promise<unknown> {
     const url = new URL(`${baseUrl.replace(/\/$/, "")}/${path}`);
     if (query) url.search = query.toString();
@@ -60,7 +60,9 @@ export function createMarketIndexer(baseUrl: string, fetcher: typeof fetch = fet
   return {
     async assertFresh(blockNumber: bigint) {
       const status = await get("status") as Record<string, unknown>;
-      if (!status || unsignedInteger(status.last_imported_block) < blockNumber ||
+      if (!status || (expectedChainId === 11155111 && (status.chain_id !== 11155111 || status.ready !== true)) ||
+          (status.chain_id !== undefined && expectedChainId !== undefined && status.chain_id !== expectedChainId) ||
+          unsignedInteger(status.last_imported_block) < blockNumber ||
           unsignedInteger(status.current_block_number) < blockNumber ||
           unsignedInteger(status.last_imported_block) > unsignedInteger(status.current_block_number)) {
         throw new MarketError("Ownership is still updating. Please refresh in a moment.");

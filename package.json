@@ -10,7 +10,13 @@
     "contracts:build": "npm --prefix contracts run build",
     "contracts:test": "npm --prefix contracts test",
     "test:market": "node --test tests/market.test.mjs",
-    "test": "node --test tests/ownership.test.mjs tests/market.test.mjs"
+    "test:sepolia": "node --test tests/sepolia.test.mjs tests/sepolia-setup.test.mjs tests/sepolia-deploy.test.mjs",
+    "sepolia:prepare": "node scripts/sepolia/prepare.mjs",
+    "dev:sepolia": "node scripts/sepolia/dev.mjs",
+    "sepolia:indexer": "node scripts/sepolia/indexer.mjs",
+    "sepolia:import": "node scripts/sepolia/import.mjs",
+    "sepolia:collection": "node scripts/sepolia/collection.mjs",
+    "test": "node --test tests/ownership.test.mjs tests/market.test.mjs tests/sepolia.test.mjs tests/sepolia-setup.test.mjs tests/sepolia-deploy.test.mjs"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.102.8",

@@ -12,7 +12,7 @@ import { TradingStatus } from "./TradingStatus";
 
 const button = "border border-ash px-4 py-2 text-sm text-bone transition hover:border-volt hover:text-volt disabled:cursor-not-allowed disabled:opacity-40";
 
-export function CupTrading({ id, ethscriptionId }: { id: number; ethscriptionId: string }) {
+export function CupTrading({ id, ethscriptionId, testnet = false }: { id: number; ethscriptionId: string; testnet?: boolean }) {
   const { address, isConnected } = useAccount();
   const [price, setPrice] = useState("");
   const query = useQuery({
@@ -24,6 +24,8 @@ export function CupTrading({ id, ethscriptionId }: { id: number; ethscriptionId:
   const cup = query.data?.cups[0];
   const claim = query.data?.claim;
   const tx = useMarketTransaction(market);
+  const wrongCollection = market && ((market.chainId === 11155111) !== testnet ||
+    (cup && cup.ethscriptionId.toLowerCase() !== ethscriptionId.toLowerCase()));
   const owner = !!address && cup?.owner.toLowerCase() === address.toLowerCase();
   const seller = !!address && cup?.seller?.toLowerCase() === address.toLowerCase();
   let priceWei: bigint | null = null;
@@ -32,7 +34,7 @@ export function CupTrading({ id, ethscriptionId }: { id: number; ethscriptionId:
   }
 
   async function write(action: "list" | "cancelListing" | "withdrawEthscription") {
-    if (!market) return;
+    if (!market || wrongCollection) return;
     const identity = ethscriptionId as Hex;
     await tx.run(action === "list" ? "Listing" : action === "cancelListing" ? "Cancellation" : "Return to wallet", async (wallet, client, assertWallet) => {
       if (action === "list") {
@@ -48,7 +50,7 @@ export function CupTrading({ id, ethscriptionId }: { id: number; ethscriptionId:
   }
 
   async function deposit() {
-    if (!market || !cup || !owner || cup.inEscrow || !market.canTrade) return;
+    if (!market || wrongCollection || !cup || !owner || cup.inEscrow || !market.canTrade) return;
     await tx.run("Deposit", async (wallet, client, assertWallet) => {
       const gas = await client.estimateGas({ account: wallet.account, to: market.address, data: cup.ethscriptionId, value: 0n });
       await assertWallet();
@@ -57,7 +59,7 @@ export function CupTrading({ id, ethscriptionId }: { id: number; ethscriptionId:
   }
 
   async function buy() {
-    if (!market || !cup?.seller || !market.canTrade) return;
+    if (!market || wrongCollection || !cup?.seller || !market.canTrade) return;
     await tx.run("Purchase", async (wallet, client, assertWallet) => {
       const signed = await marketFetch<SignedPurchase>("/api/market/authorize", {
         method: "POST", headers: { "Content-Type": "application/json" },
@@ -74,7 +76,8 @@ export function CupTrading({ id, ethscriptionId }: { id: number; ethscriptionId:
     });
   }
 
-  return <section className="border-t border-ash pt-6" aria-label={`Trade Cupscription ${id}`}>
+  if (wrongCollection) return <p className="text-sm text-mute">This marketplace is on a different network. <a href="/sepolia" className="text-volt underline">Open the Sepolia test collection</a>.</p>;
+  return <section className="border-t border-ash pt-6" aria-label={`Trade ${testnet ? "Sepolia Test Cup" : "Cupscription"} ${id}`}>
     <div className="flex items-center justify-between gap-4"><h2 className="font-[family-name:var(--font-display)] text-2xl font-bold text-bone">Trade this cup</h2><button onClick={() => query.refetch()} disabled={query.isFetching} className="text-xs text-volt underline disabled:opacity-40">Refresh</button></div>
     {query.isPending && <p className="mt-3 text-sm text-mute">Checking market status…</p>}
     {query.isError && <p className="mt-3 text-sm text-mute">Trading is temporarily unavailable. <button onClick={() => query.refetch()} className="text-volt underline">Retry</button></p>}

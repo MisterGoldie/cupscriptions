@@ -2,7 +2,6 @@ import {
   getAddress, hexToBytes, isAddress, keccak256, type Address, type Hex,
   type PrivateKeyAccount, type PublicClient,
 } from "viem";
-import { getCupMeta, getCupMetaByEthscriptionId } from "@/lib/traits";
 import { marketAbi } from "./abi.generated";
 import runtime from "./runtime.generated.json";
 import { marketCollection } from "./collection";
@@ -22,6 +21,7 @@ const sameAddress = (a: string | null | undefined, b: string) => a?.toLowerCase(
 export function createMarketService(
   config: Config, client: PublicClient, indexer: MarketIndexer,
   signer: PrivateKeyAccount | null, clock: () => number = Date.now,
+  collection = marketCollection(config.chain.id),
 ) {
   async function snapshot(): Promise<Snapshot> {
     if (await client.getChainId() !== config.chain.id) throw new MarketError("Trading network could not be verified.");
@@ -38,8 +38,8 @@ export function createMarketService(
     if (!code) throw new MarketError("Trading contract could not be verified.");
     const bytes = hexToBytes(code);
     for (const { start, length } of runtime.immutableReferences) bytes.fill(0, start, start + length);
-    if (keccak256(bytes) !== runtime.runtimeHash || root !== marketCollection().root ||
-        root !== runtime.collectionRoot || fee !== SALE_FEE || !sameAddress(recipient, FEE_RECIPIENT)) {
+    if (keccak256(bytes) !== runtime.runtimeHash || root !== collection.root ||
+        (!collection.testnet && root !== runtime.collectionRoot) || fee !== SALE_FEE || !sameAddress(recipient, FEE_RECIPIENT)) {
       throw new MarketError("Trading contract could not be verified.");
     }
     return {
@@ -55,8 +55,8 @@ export function createMarketService(
 
   function cupId(number: number): Hex {
     if (!Number.isInteger(number) || number < 1 || number > 5000) throw new MarketError("Invalid cup number.", 400);
-    const cup = getCupMeta(number);
-    if (!cup || !marketCollection().proofs.has(cup.ethscriptionId.toLowerCase())) throw new MarketError("Cup is not in this collection.", 400);
+    const cup = collection.byId.get(number);
+    if (!cup || !collection.proofs.has(cup.ethscriptionId.toLowerCase())) throw new MarketError("Cup is not in this collection.", 400);
     return cup.ethscriptionId as Hex;
   }
 
@@ -107,11 +107,11 @@ export function createMarketService(
     const readyAt = depositBlock ? depositBlock + COOLDOWN_BLOCKS : 0n;
     const verified = !inEscrow || await verifyDeposit(record, depositBlock);
     return {
-      id: number, ethscriptionId: id, owner: getAddress(record.current_owner), seller, inEscrow,
+      id: number, ethscriptionId: id, owner: getAddress(record.current_owner), seller, inEscrow, testnet: collection.testnet,
       depositBlock: depositBlock.toString(), readyAtBlock: readyAt.toString(),
       remainingBlocks: Number(readyAt > snap.number ? readyAt - snap.number : 0n),
       priceWei: listing[0].toString(), nonce: listing[1].toString(), verified,
-      proof: marketCollection().proofs.get(id.toLowerCase())!,
+      proof: collection.proofs.get(id.toLowerCase())!,
     };
   }
 
@@ -133,7 +133,7 @@ export function createMarketService(
       try {
         await indexer.assertFresh(snap.number);
         const page = await indexer.escrowPage(config.address, wallet, cursor);
-        const ids = [...new Set(page.cups.map((entry) => getCupMetaByEthscriptionId(entry.transaction_hash)?.id).filter((id): id is number => !!id))];
+        const ids = [...new Set(page.cups.map((entry) => collection.byHash.get(entry.transaction_hash.toLowerCase())?.id).filter((id): id is number => !!id))];
         const cups: MarketCup[] = [];
         // Bound provider concurrency while inspecting this page of escrow.
         for (let i = 0; i < ids.length; i += 6) {
