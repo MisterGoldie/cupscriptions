@@ -1,0 +1,51 @@
+{
+  "runtimeHash": "0xd4eda734422b9f363a5620363c2c8b3b92abfef414337b5f539c782507b045ea",
+  "immutableReferences": [
+    {
+      "length": 32,
+      "start": 814
+    },
+    {
+      "length": 32,
+      "start": 3622
+    },
+    {
+      "length": 32,
+      "start": 520
+    },
+    {
+      "length": 32,
+      "start": 2574
+    },
+    {
+      "length": 32,
+      "start": 4564
+    },
+    {
+      "length": 32,
+      "start": 4522
+    },
+    {
+      "length": 32,
+      "start": 4480
+    },
+    {
+      "length": 32,
+      "start": 4645
+    },
+    {
+      "length": 32,
+      "start": 4685
+    },
+    {
+      "length": 32,
+      "start": 3715
+    },
+    {
+      "length": 32,
+      "start": 3764
+    }
+  ],
+  "collectionRoot": "0xf41a0c0b48998aa4264d72b1d2e35fb1992a29b0d50e21e3432a13ad37d98e90",
+  "collectionSourceSha256": "b5826ab4c8b672b1f6776de73266088e489ab2de4d93c95b058cde2fd31c5413"
+}

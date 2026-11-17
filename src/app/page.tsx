@@ -48,7 +48,7 @@ export default function HomePage() {
               href="/trade"
               className="border border-bone/25 px-6 py-3 text-sm font-semibold tracking-wide text-bone transition hover:border-volt hover:text-volt"
             >
-              Trade soon
+              Trade
             </Link>
           </div>
         </div>

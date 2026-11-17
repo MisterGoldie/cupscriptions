@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "contracts:build": "npm --prefix contracts run build",
+    "contracts:test": "npm --prefix contracts test",
+    "test:market": "node --test tests/market.test.mjs",
+    "test": "node --test tests/ownership.test.mjs tests/market.test.mjs"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.102.8",

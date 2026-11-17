@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CupImage } from "@/components/CupImage";
+import { CupTrading } from "@/components/CupTrading";
 import { clampCupId, cupImageUrl, SUPPLY } from "@/lib/cups";
 import { getCupMeta } from "@/lib/traits";
 
@@ -145,12 +146,7 @@ export default async function CupPage({ params }: PageProps) {
             ) : null}
           </div>
 
-          <Link
-            href="/trade"
-            className="inline-flex w-fit bg-volt px-5 py-3 text-sm font-semibold text-ink transition hover:bg-volt-hot"
-          >
-            Trade (coming soon)
-          </Link>
+          {meta?.ethscriptionId && <CupTrading key={id} id={id} ethscriptionId={meta.ethscriptionId} />}
         </div>
       </div>
     </div>
