@@ -151,6 +151,9 @@ test("verifier fails closed for fake or stale ownership and mismatched receipts"
   assert.equal((await f.service().list()).cups[0].seller.toLowerCase(), f.seller.account.address.toLowerCase());
   await assert.rejects(f.service().authorize(6, f.buyer.account.address, { ...f.expected, seller: f.attacker.account.address }));
   for (const mismatch of [
+    { ...f.rpc, getTransaction: async (args) => ({ ...await f.rpc.getTransaction(args), hash: zeroHash }) },
+    { ...f.rpc, getTransactionReceipt: async (args) => ({ ...await f.rpc.getTransactionReceipt(args), transactionHash: zeroHash }) },
+    { ...f.rpc, getTransactionReceipt: async (args) => ({ ...await f.rpc.getTransactionReceipt(args), transactionIndex: 999 }) },
     { ...f.rpc, getTransaction: async (args) => ({ ...await f.rpc.getTransaction(args), input: zeroHash }) },
     { ...f.rpc, getTransaction: async (args) => ({ ...await f.rpc.getTransaction(args), value: 1n }) },
     { ...f.rpc, getTransactionReceipt: async (args) => ({ ...await f.rpc.getTransactionReceipt(args), status: "reverted" }) },

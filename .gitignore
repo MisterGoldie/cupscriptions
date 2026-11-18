@@ -16,7 +16,9 @@
 # next.js
 /.next/
 /.next-sepolia/
+/.next-mainnet/
 /.sepolia/
+/.mainnet/
 /out/
 
 # production

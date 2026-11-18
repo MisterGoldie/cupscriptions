@@ -7,7 +7,7 @@ import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
 const child = spawn(process.execPath, [require.resolve("next/dist/bin/next"), "dev", ...process.argv.slice(2)], {
   stdio: "inherit", windowsHide: true,
-  env: { ...process.env, CUPSCRIPTIONS_SEPOLIA_PREVIEW: "1", MARKET_CHAIN_ID: "11155111", MARKET_ADDRESS: process.env.SEPOLIA_MARKET_ADDRESS ?? "",
+  env: { ...process.env, CUPSCRIPTIONS_MAINNET_PREVIEW: "0", CUPSCRIPTIONS_SEPOLIA_PREVIEW: "1", MARKET_CHAIN_ID: "11155111", MARKET_ADDRESS: process.env.SEPOLIA_MARKET_ADDRESS ?? "",
     MARKET_VERIFIER_PRIVATE_KEY: process.env.SEPOLIA_VERIFIER_PRIVATE_KEY ?? "",
     MARKET_RPC_URL: process.env.SEPOLIA_RPC_URL ?? "https://ethereum-sepolia-rpc.publicnode.com",
     MARKET_INDEXER_URL: process.env.SEPOLIA_INDEXER_URL ?? `http://127.0.0.1:${process.env.SEPOLIA_INDEXER_PORT ?? "3031"}` },

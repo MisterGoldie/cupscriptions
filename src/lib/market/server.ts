@@ -12,13 +12,18 @@ let serviceConfigKey: string | undefined;
 
 export function getMarketService() {
   let env = process.env;
-  // A verified public deployment record activates only the isolated local
-  // Sepolia preview. Production configuration never reads this local file.
-  if (env.NODE_ENV === "development" && env.CUPSCRIPTIONS_SEPOLIA_PREVIEW === "1") {
+  // Verified public deployment records activate only isolated local previews.
+  // Direct NODE_ENV guards let production builds eliminate these file reads.
+  if (process.env.NODE_ENV === "development" && env.CUPSCRIPTIONS_MAINNET_PREVIEW === "1" && env.CUPSCRIPTIONS_SEPOLIA_PREVIEW === "1") throw new Error("Conflicting local trading networks");
+  if (process.env.NODE_ENV === "development" && (env.CUPSCRIPTIONS_SEPOLIA_PREVIEW === "1" || env.CUPSCRIPTIONS_MAINNET_PREVIEW === "1")) {
+    const mainnetPreview = env.CUPSCRIPTIONS_MAINNET_PREVIEW === "1";
+    const expectedChain = mainnetPreview ? 1 : 11155111;
     try {
-      const record = JSON.parse(fs.readFileSync(path.join(process.cwd(), ".sepolia/deployment.json"), "utf8"));
-      if (record.chainId !== 11155111 || !isAddress(record.address, { strict: false })) throw new Error("Invalid local deployment");
-      env = { ...env, MARKET_ADDRESS: record.address, MARKET_CHAIN_ID: "11155111" };
+      const record = JSON.parse(mainnetPreview
+        ? fs.readFileSync(path.join(process.cwd(), ".mainnet", "deployment.json"), "utf8")
+        : fs.readFileSync(path.join(process.cwd(), ".sepolia", "deployment.json"), "utf8"));
+      if (record.chainId !== expectedChain || !isAddress(record.address, { strict: false })) throw new Error("Invalid local deployment");
+      env = { ...env, MARKET_ADDRESS: record.address, MARKET_CHAIN_ID: String(expectedChain) };
     } catch (error) { if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw new Error("Local deployment configuration could not be verified"); }
   }
   const config = readMarketConfig(env);

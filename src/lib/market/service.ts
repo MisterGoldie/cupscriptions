@@ -87,12 +87,13 @@ export function createMarketService(
       client.getTransactionReceipt({ hash: transfer.transaction_hash }),
       client.getBlock({ blockNumber: depositBlock }),
     ]);
-    return receipt.status === "success" && receipt.blockNumber === depositBlock && transaction.blockNumber === depositBlock &&
+    return receipt.status === "success" && sameAddress(transaction.hash, transfer.transaction_hash) &&
+      sameAddress(receipt.transactionHash, transfer.transaction_hash) && receipt.blockNumber === depositBlock && transaction.blockNumber === depositBlock &&
       sameAddress(transaction.from, record.previous_owner) && sameAddress(transaction.to, config.address) &&
       sameAddress(receipt.from, record.previous_owner) && sameAddress(receipt.to, config.address) &&
       transaction.input.toLowerCase() === record.transaction_hash.toLowerCase() && transaction.value === 0n &&
       block.hash === receipt.blockHash && transaction.blockHash === block.hash && block.hash === transfer.block_blockhash &&
-      BigInt(transaction.transactionIndex) === unsignedInteger(transfer.transaction_index);
+      BigInt(transaction.transactionIndex) === unsignedInteger(transfer.transaction_index) && receipt.transactionIndex === transaction.transactionIndex;
   }
 
   async function cupState(number: number, snap: Snapshot): Promise<MarketCup> {

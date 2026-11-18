@@ -30,7 +30,9 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts",
     ".next-sepolia/types/**/*.ts",
-    ".next-sepolia/dev/types/**/*.ts"
+    ".next-sepolia/dev/types/**/*.ts",
+    ".next-mainnet/types/**/*.ts",
+    ".next-mainnet/dev/types/**/*.ts"
   ],
   "exclude": ["node_modules", "contracts/node_modules"]
 }
